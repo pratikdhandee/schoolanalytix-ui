@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>School Analytix</title>
+    <style>
+        /* General Styles */
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #F4F7FC; /* Light blue background */
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Title Section */
+        h2 {
+            font-size: 24px;
+            font-weight: bold;
+            color: #0B2C64; /* Dark blue color */
+            margin-top: 80px;
+        }
+
+        /* Input Box Container */
+        .input-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        /* Input Box */
+        input {
+            width: 60%;
+            max-width: 400px;
+            padding: 12px;
+            font-size: 16px;
+            border: 2px solid #0B2C64;
+            border-radius: 5px;
+            outline: none;
+            color: #333;
+        }
+
+        /* Placeholder Hint Effect */
+        input::placeholder {
+            color: #999;
+        }
+
+        /* Button */
+        button {
+            background-color: #FF8C00; /* Orange (Inspired by the Analytics Chart Icon) */
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-left: 10px;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background-color: #D37500; /* Darker orange for hover effect */
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Title -->
+    <h2>What can I help with?</h2>
+
+    <!-- Input Box & Button -->
+    <div class="input-container">
+        <input type="text" id="userInput" placeholder="Ask anything">
+        <button onclick="handleGoClick()">GO</button>
+    </div>
+
+    <div id="responseContainer" style="margin-top: 20px; padding: 10px; border-radius: 5px; background: #F8F9FA; color: #0B2C64; font-size: 16px;">
+        <em>Response will appear here...</em>
+    </div>
+    
+
+    <script>
+        function handleGoClick() {
+            let userQuery = document.getElementById("userInput").value;
+            let responseContainer = document.getElementById("responseContainer");
+    
+            if (userQuery.trim() !== "") {
+                fetch("https://school-analytix-api.azurewebsites.net/query", {  // Replace with your actual API URL
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ query: userQuery })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Display the response in the UI
+                    responseContainer.innerHTML = `
+                        <strong>Query:</strong> ${data.query} <br><br>
+                        <strong>Generated SQL:</strong> <code>${data.generated_sql}</code> <br><br>
+                        <strong>Result:</strong> ${JSON.stringify(data.sql_result)} <br><br>
+                        <strong>Response:</strong> ${data.natural_language_response}
+                    `;
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                    responseContainer.innerHTML = "<strong>Error:</strong> Could not fetch data.";
+                });
+            } else {
+                alert("Please enter a question.");
+            }
+        }
+    </script>
+    
+
+</body>
+</html>
